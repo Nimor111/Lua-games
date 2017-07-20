@@ -30,6 +30,40 @@ local walls = {}
 walls.current_level_walls = {}
 walls.wall_thickness = 20
 
+local collisions = {}
+
+-- COLLISION LOGIC
+function collisions.resolve_collisions()
+  collisions.ball_platform_collision( ball, platform )
+  collisions.ball_walls_collision( ball, walls )
+  collisions.ball_bricks_collision( ball, bricks )
+  collisions.platform_walls_collision( platform, walls )
+end
+
+function collisions.check_rectangles_overlap( a, b )
+  local overlap = false
+  if not( a.x + a.width < b.x or b.x + b.width < a.x or
+          a.y + a.height < b.y or b.y + b.height < a.y ) then
+    overlap = true
+  end
+  return overlap
+end
+
+function collisions.ball_platform_collision()
+  local a = { x = platform.position_x,
+              y = platform.position_y,
+              width = platform.width,
+              height = platform.height }
+  local b = { x = ball.position_x - ball.radius,
+              y = ball.position_y - ball.radius,
+              width = 2 * ball.radius,
+              height = 2 * ball.radius }
+  if collisions.check_rectangles_overlap( a, b ) then
+    print("Ball platform collision!")
+  end
+end
+-- END COLLISION LOGIC
+
 -- BRICK LOGIC
 function bricks.new_brick(position_x, position_y, width, height)
   return ( {
@@ -168,6 +202,7 @@ function love.update(dt)
   platform.update(dt)
   bricks.update(dt)
   walls.update(dt)
+  collisions.resolve_collisions()
 end
 
 -- Draw helper functions for objects
