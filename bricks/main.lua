@@ -62,6 +62,54 @@ function collisions.ball_platform_collision()
     print("Ball platform collision!")
   end
 end
+
+function collisions.ball_bricks_collision()
+  local b = { x = ball.position_x - ball.radius,
+              y = ball.position_y - ball.radius,
+              width = 2 * ball.radius,
+              height = 2 * ball.radius }
+  for _, brick in pairs(bricks.current_level_bricks) do
+    local a = { x = brick.position_x,
+                y = brick.position_y,
+                width = brick.width,
+                height = brick.height }
+    if collisions.check_rectangles_overlap( a, b ) then
+      print('Ball brick collision')
+    end
+  end
+end
+
+function collisions.ball_walls_collision()
+  local b = { x = ball.position_x - ball.radius,
+              y = ball.position_y - ball.radius,
+              width = 2 * ball.radius,
+              height = 2 * ball.radius }
+  for _, wall in pairs(walls.current_level_walls) do
+    local a = { x = wall.position_x,
+                y = wall.position_y,
+                width = wall.width,
+                height = wall.height }
+    if collisions.check_rectangles_overlap( a, b ) then
+      print('Ball wall collision')
+    end
+  end
+end
+
+function collisions.platform_walls_collision()
+  local a = { x = platform.position_x,
+              y = platform.position_y,
+              width = platform.width,
+              height = platform.height }
+  for _, wall in pairs(walls.current_level_walls) do
+    local b = { x = wall.position_x,
+                y = wall.position_y,
+                width = wall.width,
+                height = wall.height }
+    if collisions.check_rectangles_overlap( a, b ) then
+      print('Platform wall collision')
+    end
+  end
+end
 -- END COLLISION LOGIC
 
 -- BRICK LOGIC
@@ -234,4 +282,10 @@ end
 
 function love.quit()
   print("Thanks for playing! Come back soon!")
+end
+
+function love.keyreleased( key, _code )
+  if key == 'escape' then
+    love.event.quit()
+  end
 end
