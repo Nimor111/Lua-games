@@ -32,26 +32,28 @@ walls.wall_thickness = 20
 
 local levels = {}
 levels.sequence = {}
-levels.sequence[1] = {
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-   { 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1 },
-   { 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1 },
-   { 1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0 },
-   { 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0 },
-   { 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0 },
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-}
-levels.sequence[2] = {
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-   { 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 1 },
-   { 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0 },
-   { 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0 },
-   { 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0 },
-   { 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1 },
-   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-}
+
+levels.sequence[1] = [[
+___________
+
+# # ### # #
+# # #   # #
+### ##   # 
+# # #    # 
+# # ###  # 
+___________
+]]
+
+levels.sequence[2] = [[
+___________
+
+### # # ###
+# # # # #  
+###  #  ## 
+# #  #  #  
+###  #  ###
+___________
+]]
 levels.current_level = 1
 
 function levels.switch_to_next_level( bricks ) 
@@ -208,9 +210,13 @@ end
 
 function bricks.construct_level( level_bricks_arrangement )
   bricks.no_more_bricks = false
-  for row_index, row in ipairs( level_bricks_arrangement ) do
-    for col_index, bricktype in ipairs( row ) do
-      if bricktype ~= 0 then
+  local row_index = 0
+  for row in level_bricks_arrangement:gmatch('(.-)\n') do
+    row_index = row_index + 1
+    local col_index = 0
+    for bricktype in row:gmatch('.') do
+      col_index = col_index + 1
+      if bricktype == '#' then
         local new_brick_position_x = bricks.top_left_position_x +
         ( col_index - 1 ) * ( bricks.brick_width + bricks.horizontal_distance )
         local new_brick_position_y = bricks.top_left_position_y +
