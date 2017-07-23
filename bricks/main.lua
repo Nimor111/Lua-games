@@ -3,13 +3,13 @@ local rows = 8
 
 local ball = {}
 ball.position_x = 300
-ball.position_y = 300
-ball.speed_x = 300
-ball.speed_y = 300
-ball.radius = 30
+ball.position_y = 500
+ball.speed_x = 30
+ball.speed_y = 30
+ball.radius = 15
 
 local platform = {}
-platform.position_x = 500
+platform.position_x = 300
 platform.position_y = 500
 platform.speed_x = 300
 platform.width = 70
@@ -45,11 +45,22 @@ function collisions.check_rectangles_overlap( a, b )
   if not( a.x + a.width < b.x or b.x + b.width < a.x or
           a.y + a.height < b.y or b.y + b.height < a.y ) then
     overlap = true
+    if ( a.x + a.width / 2) < ( b.x + b.width / 2 ) then
+      shift_b_x = ( a.x + a.width ) - b.x 
+    else 
+      shift_b_x = a.x - ( b.x + b.width )
+    end
+    if ( a.y + a.height / 2 ) < ( b.y + b.height ) then
+      shift_b_y = ( a.y + a.height ) - b.y
+    else
+      shift_b_y = a.y - ( b.y + b.height )
+    end
   end
-  return overlap
+  return overlap, shift_b_x, shift_b_y
 end
 
-function collisions.ball_platform_collision()
+function collisions.ball_platform_collision( ball, platform )
+  local overlap, shift_ball_x, shift_ball_y
   local a = { x = platform.position_x,
               y = platform.position_y,
               width = platform.width,
@@ -58,8 +69,9 @@ function collisions.ball_platform_collision()
               y = ball.position_y - ball.radius,
               width = 2 * ball.radius,
               height = 2 * ball.radius }
-  if collisions.check_rectangles_overlap( a, b ) then
-    print("Ball platform collision!")
+  overlap, shift_ball_x, shift_ball_y = collisions.check_rectangles_overlap( a, b ) 
+  if overlap then 
+    ball.rebound( shift_ball_x, shift_ball_y )
   end
 end
 
@@ -233,6 +245,26 @@ end
 function ball.update(dt)
   ball.position_x = ball.position_x + ball.speed_x * dt
   ball.position_y = ball.position_y + ball.speed_y * dt
+end
+
+function ball.rebound( shift_ball_x, shift_ball_y )
+  local min_shift = math.min( math.abs(shift_ball_x),
+                              math.abs(shift_ball_y) )
+  if math.abs( shift_ball_x ) == min_shift then 
+    shift_ball_y = 0
+  else
+    shift_ball_x = 0
+  end
+
+  ball.position_x = ball.position_x + shift_ball_x
+  ball.position_y = ball.position_y + shift_ball_y
+
+  if shift_ball_x ~= 0 then
+    ball.speed_x = -ball.speed_x
+  end
+  if shift_ball_y ~= 0 then
+    ball.speed_y = -ball.speed_y
+  end
 end
 
 function platform.update(dt)
