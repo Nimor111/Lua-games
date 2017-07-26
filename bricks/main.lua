@@ -1,19 +1,8 @@
 local columns = 11
 local rows = 8
 
-local ball = {}
-ball.position_x = 300
-ball.position_y = 500
-ball.speed_x = 300
-ball.speed_y = 300 
-ball.radius = 15
-
-local platform = {}
-platform.position_x = 300
-platform.position_y = 500
-platform.speed_x = 300
-platform.width = 70
-platform.height = 20
+local ball = require "ball"
+local platform = require "platform"
 
 local bricks = {}
 bricks.rows = rows
@@ -30,43 +19,7 @@ local walls = {}
 walls.current_level_walls = {}
 walls.wall_thickness = 20
 
-local levels = {}
-levels.sequence = {}
-
-levels.sequence[1] = [[
-___________
-
-# # ### # #
-# # #   # #
-### ##   # 
-# # #    # 
-# # ###  # 
-___________
-]]
-
-levels.sequence[2] = [[
-___________
-
-### # # ###
-# # # # #  
-###  #  ## 
-# #  #  #  
-###  #  ###
-___________
-]]
-levels.current_level = 1
-
-function levels.switch_to_next_level( bricks ) 
-  if bricks.no_more_bricks then
-    if levels.current_level < #levels.sequence then
-      levels.current_level = levels.current_level + 1
-      bricks.construct_level( levels.sequence[levels.current_level] )
-      ball.reposition()
-    else
-      levels.gamefinished = true
-    end
-  end
-end
+local levels = require "levels"
 
 local collisions = {}
 
@@ -173,19 +126,6 @@ function collisions.platform_walls_collision()
   end
 end
 -- END COLLISION LOGIC
-
-function platform.rebound( shift_platform_x, shift_platform_y )
-  local min_shift = math.min( math.abs( shift_platform_x ),
-                              math.abs( shift_platform_y ) )
-  if math.abs( shift_platform_x ) == min_shift then 
-    shift_platform_y = 0
-  else
-    shift_platform_x = 0
-  end
-
-  platform.position_x = platform.position_x - shift_platform_x
-  platform.position_y = platform.position_y - shift_platform_y
-end
 
 -- BRICK LOGIC
 function bricks.new_brick(position_x, position_y, width, height)
@@ -316,44 +256,6 @@ function love.load()
 end
 
 -- Update helper functions for objects
-function ball.update(dt)
-  ball.position_x = ball.position_x + ball.speed_x * dt
-  ball.position_y = ball.position_y + ball.speed_y * dt
-end
-
-function ball.reposition()
-  ball.position_x = 200
-  ball.position_y = 500
-end
-
-function ball.rebound( shift_ball_x, shift_ball_y )
-  local min_shift = math.min( math.abs(shift_ball_x),
-                              math.abs(shift_ball_y) )
-  if math.abs( shift_ball_x ) == min_shift then 
-    shift_ball_y = 0
-  else
-    shift_ball_x = 0
-  end
-
-  ball.position_x = ball.position_x + shift_ball_x
-  ball.position_y = ball.position_y + shift_ball_y
-
-  if shift_ball_x ~= 0 then
-    ball.speed_x = -ball.speed_x
-  end
-  if shift_ball_y ~= 0 then
-    ball.speed_y = -ball.speed_y
-  end
-end
-
-function platform.update(dt)
-  if love.keyboard.isDown("right") then
-    platform.position_x = platform.position_x + (platform.speed_x * dt)
-  end
-  if love.keyboard.isDown("left") then
-    platform.position_x = platform.position_x - (platform.speed_x * dt)
-  end
-end
 -- Update helper functions for objects
 
 function love.update(dt)
@@ -366,23 +268,6 @@ function love.update(dt)
 end
 
 -- Draw helper functions for objects
-function ball.draw()
-  local segments_in_circle = 16
-
-  love.graphics.circle( 'line',
-                        ball.position_x,
-                        ball.position_y,
-                        ball.radius,
-                        segments_in_circle )
-end
-
-function platform.draw()
-  love.graphics.rectangle( 'line',
-                            platform.position_x,
-                            platform.position_y,
-                            platform.width,
-                            platform.height )
-end
 -- Draw helper functions for objects
 
 function love.draw()
