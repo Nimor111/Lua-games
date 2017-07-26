@@ -9,6 +9,7 @@ local bricks = require "bricks"
 local collisions = require "collisions"
 
 function love.load()
+  love.window.setTitle( "Awesome breaker" )
   bricks.construct_level( levels.sequence[levels.current_level] )
   walls.construct_walls()
 end
